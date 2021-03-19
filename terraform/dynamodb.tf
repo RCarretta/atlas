@@ -6,11 +6,13 @@ resource "aws_dynamodb_table" "atlas" {
   hash_key  = "PK" # partition key
   range_key = "SK" # sort key
 
+  # the primaryKey attribute will just be named "PK" for heavy overloading
   attribute {
     name = "PK"
     type = "S"
   }
 
+  # the sortKey attribute will just be named "SK" for heavy overloading
   attribute {
     name = "SK"
     type = "S"
