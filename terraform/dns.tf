@@ -14,10 +14,33 @@ resource "aws_route53_zone" "eldritch-atlas" {
 }
 
 resource "aws_route53_record" "github-verified-domain" {
-  count   = var.parent_dns_zone == var.dns_zone ? 1 : 0 # only create and manage this resource if this is not a subdomain
+  count   = var.parent_dns_zone == var.dns_zone ? 1 : 0  # only create and manage this resource if this is not a subdomain
   name    = "_github-challenge-eldritch-atlas"
   type    = "TXT"
-  ttl = 300
+  ttl     = 300
   zone_id = data.aws_route53_zone.eldritch-atlas-parent.id
   records = ["fd1b134c84"]
+}
+
+# Add NS record to parent domain
+resource "aws_route53_record" "zone-delegation" {
+  count = var.dns_zone == var.parent_dns_zone ? 0 : 1  # only delegate if not top level
+  name = trimsuffix(var.dns_zone, ".${var.parent_dns_zone}")
+  type = "NS"
+  ttl = 1440
+  zone_id = data.aws_route53_zone.eldritch-atlas-parent.id
+  records = aws_route53_zone.eldritch-atlas.name_servers
+}
+
+# Point DNS at the API Gateway - TODO this should be cloudfront
+resource "aws_route53_record" "atlas-api" {
+  name    = aws_api_gateway_domain_name.atlas.domain_name
+  type    = "A"
+  zone_id = aws_route53_zone.eldritch-atlas.id
+
+  alias {
+    evaluate_target_health = true
+    name                   = aws_api_gateway_domain_name.atlas.regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.atlas.regional_zone_id
+  }
 }
