@@ -1,0 +1,69 @@
+resource "aws_api_gateway_rest_api" "atlas" {
+  name = "atlas-api-${var.environment}"
+  description = "Atlas v1 API for ${var.environment} environment"
+  tags = {
+    Environment = var.environment
+  }
+}
+
+# --- API Domain/Settings
+# Establish ownership / TLS settings for API gateway
+# Use a regional rather than edge-optimied type so we can customize our CloudFront distribution that fronts the API
+resource "aws_api_gateway_domain_name" "atlas" {
+  domain_name              = aws_route53_zone.eldritch-atlas.name
+  regional_certificate_arn = aws_acm_certificate_validation.root_certificate_validation_workflow.certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+# Map this API stage to the root of the domain
+resource "aws_api_gateway_base_path_mapping" "atlas" {
+  api_id      = aws_api_gateway_rest_api.atlas.id
+  domain_name = aws_api_gateway_domain_name.atlas.domain_name
+  stage_name  = aws_api_gateway_stage.v1.stage_name
+}
+# ---
+
+# --- API Stage/Settings
+resource "aws_api_gateway_stage" "v1" {
+  deployment_id = aws_api_gateway_deployment.atlas.id
+  rest_api_id   = aws_api_gateway_rest_api.atlas.id
+  stage_name    = "v1"  #  DO NOT CHANGE THIS. If the API is to be versioned, add a new stage.
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_api_gateway_method_settings" "atlas" {
+  rest_api_id = aws_api_gateway_rest_api.atlas.id
+  stage_name  = aws_api_gateway_stage.v1.stage_name
+  method_path = "*/*"  # format: path/METHOD
+
+  settings {
+    metrics_enabled = true
+    logging_level = "ERROR"
+    data_trace_enabled = false  # yay, debugging
+    caching_enabled = false  # TODO: i think we should cache in CF and not here, but revisit -RC
+  }
+}
+# ---
+
+# --- Deployment
+resource "aws_api_gateway_deployment" "atlas" {
+  rest_api_id = aws_api_gateway_rest_api.atlas.id
+
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.atlas.body))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+# ---
