@@ -1,6 +1,6 @@
 #Certificate creation and validation
 resource "aws_acm_certificate" "root" {
-  provider          = aws.region
+  provider          = aws.us-east-1
   domain_name       = var.dns_zone
   validation_method = "DNS"
 

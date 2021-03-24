@@ -24,6 +24,22 @@ module "api" {
   certificate_arn = module.certificate.certificate_arn
 }
 
+module "logging" {
+  source = "../modules/logging"
+  application_name = var.application_name
+  environment = var.environment
+}
+
+module "frontend" {
+  source = "../modules/frontend"
+  api_domain_name = module.api.api_domain_name
+  application_name = var.application_name
+  environment = var.environment
+  certificate_arn = module.certificate.certificate_arn
+  dns_zone = var.dns_zone
+  logging_bucket_domain = module.logging.logging_bucket_domain
+}
+
 resource "aws_route53_record" "github-verified-domain" {
   count   = var.parent_zone == var.dns_zone ? 1 : 0 # only create and manage this resource if this is not a subdomain
   name    = "_github-challenge-eldritch-atlas"

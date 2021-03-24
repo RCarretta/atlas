@@ -4,4 +4,6 @@ environment = "staging"
 
 # DNS
 dns_zone        = "staging.eldritch-atlas.com"
-parent_dns_zone = "eldritch-atlas.com"
+parent_zone = "eldritch-atlas.com"
+
+application_name = "atlas"

@@ -5,3 +5,5 @@ environment = "prod"
 # DNS
 dns_zone    = "eldritch-atlas.com"
 parent_zone = "eldritch-atlas.com"
+
+application_name = "atlas"

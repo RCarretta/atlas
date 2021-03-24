@@ -6,6 +6,7 @@ data "aws_route53_zone" "parent_zone" {
 
 # for production / highest level domain, this needs to be created outside TF and imported
 resource "aws_route53_zone" "zone" {
+  count = var.dns_zone == var.parent_zone ? 0 : 1  # don't create the root zone
   name = var.dns_zone
 
   tags = {
@@ -20,5 +21,5 @@ resource "aws_route53_record" "zone-delegation" {
   type    = "NS"
   ttl     = 1440
   zone_id = data.aws_route53_zone.parent_zone.id
-  records = aws_route53_zone.zone.name_servers
+  records = aws_route53_zone.zone[0].name_servers
 }
