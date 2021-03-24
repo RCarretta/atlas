@@ -1,11 +1,14 @@
 locals {
   cf_log_dir = "cf-logs"
+  s3_origin_id = "s3"
+  api_origin_id = "api"
 }
 
 # CF distribution for regional endpoint and optional caching
 resource "aws_cloudfront_distribution" "frontend" {
   provider            = aws.us-east-1
   enabled             = true
+  is_ipv6_enabled = true
   default_root_object = "index.html"
   price_class         = "PriceClass_100"
   aliases             = [var.dns_zone]
@@ -18,12 +21,19 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   origin {
     domain_name = var.api_domain_name
-    origin_id = "api"
+    origin_id = local.api_origin_id
+
+    custom_origin_config {
+      http_port = 80
+      https_port             = "443"
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
   }
 
   origin {
     domain_name = aws_s3_bucket.website.bucket_regional_domain_name
-    origin_id   = "s3"
+    origin_id   = local.s3_origin_id
 
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.frontend.cloudfront_access_identity_path
@@ -35,7 +45,7 @@ resource "aws_cloudfront_distribution" "frontend" {
     cached_methods         = ["GET", "HEAD"]
 
     path_pattern           = "/api/*"
-    target_origin_id       = "api"
+    target_origin_id       = local.api_origin_id
     viewer_protocol_policy = "redirect-to-https"
     default_ttl            = 0   # don't actually cache anything for now, unless explicitly set
     compress               = true
@@ -53,7 +63,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "s3"
+    target_origin_id       = local.s3_origin_id
     viewer_protocol_policy = "redirect-to-https"
     compress               = false
     default_ttl            = 0  # don't actually cache anything for now, unless explicitly set

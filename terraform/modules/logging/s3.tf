@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "logging" {
   bucket = "${var.application_name}-${var.environment}-logging"
-  region = var.region
   acl    = "log-delivery-write"
 
   server_side_encryption_configuration {
