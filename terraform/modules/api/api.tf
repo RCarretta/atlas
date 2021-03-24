@@ -1,11 +1,11 @@
-resource "aws_api_gateway_rest_api" "atlas" {
+resource "aws_api_gateway_rest_api" "api" {
   name        = "atlas-api-${var.environment}"
   description = "Atlas v1 API for ${var.environment} environment"
   endpoint_configuration {
     types = ["REGIONAL"]
   }
 
-  body = jsonencode(yamldecode(file("api.yaml")))
+  body = jsonencode(yamldecode(file("./api.yaml")))
 
   tags = {
     Environment = var.environment
@@ -15,7 +15,7 @@ resource "aws_api_gateway_rest_api" "atlas" {
 # --- API Domain/Settings
 # Establish ownership / TLS settings for API gateway
 # Use a regional rather than edge-optimied type so we can customize our CloudFront distribution that fronts the API
-resource "aws_api_gateway_domain_name" "atlas" {
+resource "aws_api_gateway_domain_name" "api" {
   domain_name              = var.dns_zone
   regional_certificate_arn = var.certificate_arn
 
@@ -29,17 +29,17 @@ resource "aws_api_gateway_domain_name" "atlas" {
 }
 
 # Map this API stage to the root of the domain
-resource "aws_api_gateway_base_path_mapping" "atlas" {
-  api_id      = aws_api_gateway_rest_api.atlas.id
-  domain_name = aws_api_gateway_domain_name.atlas.domain_name
+resource "aws_api_gateway_base_path_mapping" "api" {
+  api_id      = aws_api_gateway_rest_api.api.id
+  domain_name = aws_api_gateway_domain_name.api.domain_name
   stage_name  = aws_api_gateway_stage.v1.stage_name
 }
 # ---
 
 # --- API Stage/Settings
 resource "aws_api_gateway_stage" "v1" {
-  deployment_id = aws_api_gateway_deployment.atlas.id
-  rest_api_id   = aws_api_gateway_rest_api.atlas.id
+  deployment_id = aws_api_gateway_deployment.api.id
+  rest_api_id   = aws_api_gateway_rest_api.api.id
   stage_name    = "v1" #  DO NOT CHANGE THIS. If the API is to be versioned, add a new stage.
   tags = {
     Environment = var.environment
@@ -62,11 +62,11 @@ resource "aws_api_gateway_stage" "v1" {
 # ---
 
 # --- Deployment
-resource "aws_api_gateway_deployment" "atlas" {
-  rest_api_id = aws_api_gateway_rest_api.atlas.id
+resource "aws_api_gateway_deployment" "api" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.atlas.body))
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.api.body))
   }
 
   lifecycle {
