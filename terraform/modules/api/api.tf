@@ -16,8 +16,8 @@ resource "aws_api_gateway_rest_api" "atlas" {
 # Establish ownership / TLS settings for API gateway
 # Use a regional rather than edge-optimied type so we can customize our CloudFront distribution that fronts the API
 resource "aws_api_gateway_domain_name" "atlas" {
-  domain_name              = aws_route53_zone.eldritch-atlas.name
-  regional_certificate_arn = aws_acm_certificate_validation.root_certificate_validation_workflow.certificate_arn
+  domain_name              = var.dns_zone
+  regional_certificate_arn = var.certificate_arn
 
   endpoint_configuration {
     types = ["REGIONAL"]

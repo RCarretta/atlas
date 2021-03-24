@@ -1,6 +1,7 @@
 variable "region" {
-  description = "Primary AWS Region"
-  type        = string
+  type = string
+  default = "us-east-1"  # CF distributions require certificates in us-east-1, so this is the default
+  description = "Region for certificates"
 }
 
 variable "environment" {
@@ -13,7 +14,7 @@ variable "dns_zone" {
   type        = string
 }
 
-variable "parent_zone" {
-  description = "Parent (top level) DNS Zone for use with delegations"
+variable "dns_zone_id" {
+  description = "Primary DNS Zone ID"
   type        = string
 }

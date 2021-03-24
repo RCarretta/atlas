@@ -1,6 +1,6 @@
 #Certificate creation and validation
 resource "aws_acm_certificate" "root" {
-  provider          = aws.us-east-1 # CF distributions require certificates in us-east-1
+  provider          = aws.region
   domain_name       = var.dns_zone
   validation_method = "DNS"
 
@@ -26,12 +26,11 @@ resource "aws_route53_record" "root_certificate_validation" {
   type            = each.value.type
   records         = [each.value.record]
   ttl             = 60
-  zone_id         = aws_route53_zone.eldritch-atlas.id
+  zone_id         = var.dns_zone_id
 }
 
 # Note this doesn't create an AWS 'resource' as such. it's a workflow-only item
 resource "aws_acm_certificate_validation" "root_certificate_validation_workflow" {
   certificate_arn         = aws_acm_certificate.root.arn
   validation_record_fqdns = [for record in aws_route53_record.root_certificate_validation : record.fqdn]
-  depends_on = [aws_route53_record.zone-delegation]  #  ensure the record will be reachable before attempting the dns-01 validation
 }
