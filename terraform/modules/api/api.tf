@@ -1,5 +1,5 @@
 resource "aws_api_gateway_rest_api" "atlas" {
-  name = "atlas-api-${var.environment}"
+  name        = "atlas-api-${var.environment}"
   description = "Atlas v1 API for ${var.environment} environment"
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -40,7 +40,7 @@ resource "aws_api_gateway_base_path_mapping" "atlas" {
 resource "aws_api_gateway_stage" "v1" {
   deployment_id = aws_api_gateway_deployment.atlas.id
   rest_api_id   = aws_api_gateway_rest_api.atlas.id
-  stage_name    = "v1"  #  DO NOT CHANGE THIS. If the API is to be versioned, add a new stage.
+  stage_name    = "v1" #  DO NOT CHANGE THIS. If the API is to be versioned, add a new stage.
   tags = {
     Environment = var.environment
   }

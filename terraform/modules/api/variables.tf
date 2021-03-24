@@ -1,6 +1,6 @@
 variable "certificate_arn" {
   description = "AWS ARN of TLS certificate to use"
-  type = string
+  type        = string
 }
 
 variable "environment" {
