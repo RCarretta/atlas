@@ -1,0 +1,196 @@
+openapi: 3.0.0
+info:
+  title: Atlas
+  version: '1.0'
+servers:
+  - url: '${aws_api_gateway_deployment.atlas.invoke_url}'
+paths:
+  /documents:
+    get:
+      summary: Get all documents
+      tags:
+        - documents
+      x-amazon-apigateway-integration:
+        type: mock
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+      operationId: get-documents
+      description: List all document UUIDs.
+      parameters: []
+    post:
+      summary: Create a new document
+      tags:
+        - documents
+      x-amazon-apigateway-integration:
+        type: mock
+      responses:
+        '201':
+          description: Document Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Missing Required Information
+      operationId: post-documents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentRequired'
+      description: Create a new document.
+  '/documents/{documentId}':
+    parameters:
+      - schema:
+          type: string
+        name: documentId
+        in: path
+        required: true
+    get:
+      summary: Get a document by ID
+      tags:
+        - documents
+      x-amazon-apigateway-integration:
+        type: mock
+      responses:
+        '200':
+          description: Document Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Document Not Found
+      operationId: get-documents-documentId
+      description: Retrieve a document with the matching UUID.
+    put:
+      summary: Overwrite a document
+      tags:
+        - documents
+      x-amazon-apigateway-integration:
+        type: mock
+      responses:
+        '200':
+          description: Document Edited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Document Not Found
+      operationId: put-documents-documentId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                  required:
+                    - id
+                - $ref: '#/components/schemas/DocumentRequired'
+      description: Overwrite a document with the matching UUID.
+    patch:
+      summary: Change a document
+      tags:
+        - documents
+      x-amazon-apigateway-integration:
+        type: mock
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Document Not Found
+      operationId: patch-documents-documentId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - properties:
+                    data:
+                      type: object
+                - properties:
+                    meta:
+                      type: string
+              type: object
+      description: Overwrite one or more properties of a document with the matching UUID.
+    delete:
+      summary: Delete a document
+      tags:
+        - documents
+      x-amazon-apigateway-integration:
+        type: mock
+      responses:
+        '204':
+          description: Document Deleted
+        '404':
+          description: Document Not Found
+      operationId: delete-documents-documentId
+      description: Delete the document with the matching UUID.
+    head:
+      summary: ''
+      operationId: head-documents-documentId
+      x-amazon-apigateway-integration:
+        type: mock
+      responses:
+        '200':
+          description: Document Exists
+        '404':
+          description: Document Not Found
+      description: Check if a document with the matching UUID exists.
+      tags:
+        - documents
+components:
+  schemas:
+    Document:
+      title: Document
+      allOf:
+        - $ref: '#/components/schemas/DocumentRequired'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Object UUID
+            createdAt:
+              type: string
+              description: 'Created at : ISO 8601 Timestamp'
+            lastModified:
+              type: string
+              description: 'Last modified : ISO 8601 Timestamp'
+          required:
+            - id
+            - createdAt
+            - lastModified
+      x-examples:
+        example-1:
+          data: {}
+          meta: string
+          id: string
+    DocumentRequired:
+      title: DocumentRequired
+      type: object
+      properties:
+        data:
+          type: object
+          description: An arbitrary JSON object to be contained
+        meta:
+          type: string
+          description: Metadata about the contained object
+      required:
+        - data
+  parameters: {}
+  responses: {}

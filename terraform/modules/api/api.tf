@@ -1,6 +1,12 @@
 resource "aws_api_gateway_rest_api" "atlas" {
   name = "atlas-api-${var.environment}"
   description = "Atlas v1 API for ${var.environment} environment"
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  body = jsonencode(yamldecode(file("api.yaml")))
+
   tags = {
     Environment = var.environment
   }
@@ -40,18 +46,19 @@ resource "aws_api_gateway_stage" "v1" {
   }
 }
 
-resource "aws_api_gateway_method_settings" "atlas" {
-  rest_api_id = aws_api_gateway_rest_api.atlas.id
-  stage_name  = aws_api_gateway_stage.v1.stage_name
-  method_path = "*/*"  # format: path/METHOD
-
-  settings {
-    metrics_enabled = true
-    logging_level = "ERROR"
-    data_trace_enabled = false  # yay, debugging
-    caching_enabled = false  # TODO: i think we should cache in CF and not here, but revisit -RC
-  }
-}
+# TODO FIXME Cloudwatch role ARN and CW infra necessary to pipe logs out
+#resource "aws_api_gateway_method_settings" "atlas" {
+#  rest_api_id = aws_api_gateway_rest_api.atlas.id
+#  stage_name  = aws_api_gateway_stage.v1.stage_name
+#  method_path = "*/*"  # format: path/METHOD
+#
+#  settings {
+#    metrics_enabled = true
+#    logging_level = "ERROR"
+#    data_trace_enabled = false  # yay, debugging
+#    caching_enabled = false  # TODO: i think we should cache in CF and not here, but revisit -RC
+#  }
+#}
 # ---
 
 # --- Deployment
