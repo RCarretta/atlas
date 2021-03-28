@@ -48,3 +48,20 @@ resource "aws_route53_record" "github-verified-domain" {
   zone_id = module.dns_zone.dns_zone_id
   records = ["fd1b134c84"]
 }
+
+resource "aws_sns_topic" "alerts" {
+  name = "${var.environment}-alerts"
+  tags = {
+    Environment = var.environment
+  }
+}
+
+module "api_lambda_document" {
+  source = "../modules/lambda_api_handler"
+  application_name = var.application_name
+  environment = var.environment
+  lambda_dead_letter_arn = aws_sns_topic.alerts.arn
+  lambda_desc = "API for /document and subtree"
+  lambda_name = "document"
+  lambda_runtime = "python3.6"
+}

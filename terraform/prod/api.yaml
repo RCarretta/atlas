@@ -2,14 +2,17 @@ openapi: 3.0.0
 info:
   title: Atlas
   version: '1.0'
+  description: Eldritch Atlas - API
 servers:
-  - url: '${aws_api_gateway_deployment.atlas.invoke_url}'
+  - url: 'https://eldritch-atlas.com/api/v1'
+    description: v1
 paths:
   /documents:
     get:
       summary: Get all documents
       tags:
         - documents
+      x-amazon-apigateway-auth object: "NONE"
       x-amazon-apigateway-integration:
         type: mock
       responses:
@@ -28,6 +31,7 @@ paths:
       summary: Create a new document
       tags:
         - documents
+      x-amazon-apigateway-auth object: "NONE"
       x-amazon-apigateway-integration:
         type: mock
       responses:
@@ -57,6 +61,7 @@ paths:
       summary: Get a document by ID
       tags:
         - documents
+      x-amazon-apigateway-auth object: "NONE"
       x-amazon-apigateway-integration:
         type: mock
       responses:
@@ -74,6 +79,7 @@ paths:
       summary: Overwrite a document
       tags:
         - documents
+      x-amazon-apigateway-auth object: "NONE"
       x-amazon-apigateway-integration:
         type: mock
       responses:
@@ -103,6 +109,7 @@ paths:
       summary: Change a document
       tags:
         - documents
+      x-amazon-apigateway-auth object: "NONE"
       x-amazon-apigateway-integration:
         type: mock
       responses:
@@ -132,6 +139,7 @@ paths:
       summary: Delete a document
       tags:
         - documents
+      x-amazon-apigateway-auth object: "NONE"
       x-amazon-apigateway-integration:
         type: mock
       responses:
@@ -144,6 +152,7 @@ paths:
     head:
       summary: ''
       operationId: head-documents-documentId
+      x-amazon-apigateway-auth object: "NONE"
       x-amazon-apigateway-integration:
         type: mock
       responses:
@@ -194,3 +203,5 @@ components:
         - data
   parameters: {}
   responses: {}
+  securitySchemes: {}
+security: []
