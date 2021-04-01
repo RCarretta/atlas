@@ -1,0 +1,31 @@
+version: 0.2
+
+# env:
+#   variables:
+#     ENVIRONMENT: "${environment}"
+#     APPLICATION: "${application_name}"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+      - npm install
+      # - npm run lint
+#  pre_build:
+#    commands:
+#      - npm install
+#      - npm run test
+  build:
+    commands:
+      - npm run build
+
+artifacts:
+  files:
+    - "public/**/*"
+  name: "${environment}-${application_name}-frontend"
+  base-directory: build
+
+cache:
+  paths:
+    - /root/.npm/**/*

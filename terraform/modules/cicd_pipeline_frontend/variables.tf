@@ -42,7 +42,7 @@ variable "queued_timeout" {
 
 variable "build_badge_enabled" {
   description = "Whether or not to enable fancy build badge"
-  default = true
+  default = false
   type = bool
 }
 variable "build_compute_type" {
@@ -63,4 +63,9 @@ variable "build_privileged" {
   description = "Run build in privileged mode. Only necessary when building docker containers."
   type = bool
   default = false
+}
+
+variable "frontend_buildspec_filename" {
+  description = "Filename of buildspec yaml"
+  type = string
 }

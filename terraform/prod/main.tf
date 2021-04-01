@@ -84,7 +84,8 @@ module "frontend_pipeline" {
   application_name = var.application_name
   artifact_bucket = aws_s3_bucket.pipeline.bucket
   environment = var.environment
-  monitored_branch = var.pipeline_branch['frontend']
-  repository = var.repositories['frontend']
+  monitored_branch = var.pipeline_branch["frontend"]
+  repository = var.repositories["frontend"]
   web_bucket = var.dns_zone
+  frontend_buildspec_filename = "frontend-buildspec.yml"
 }

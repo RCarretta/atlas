@@ -1,13 +1,19 @@
 data "aws_s3_bucket" "artifacts" {
   bucket = var.artifact_bucket
+  depends_on = [var.artifact_bucket]
 }
 
 data "aws_s3_bucket" "web-bucket" {
   bucket = var.web_bucket
+  depends_on = [var.web_bucket]
 }
 
 data "template_file" "buildspec" {
-  template = "${file("frontend-buildspec.yml")}"
+  template = "${file(var.frontend_buildspec_filename)}"
+  vars = {
+    environment = var.environment
+    application_name = var.application_name
+  }
 }
 
 resource "aws_codepipeline" "pipeline" {
@@ -98,6 +104,13 @@ resource "aws_iam_role" "pipeline" {
       "Effect": "Allow",
       "Principal": {
         "Service": "codepipeline.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "codebuild.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
