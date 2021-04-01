@@ -22,3 +22,13 @@ variable "application_name" {
   description = "Name of the application"
   type = string
 }
+
+variable "pipeline_branch" {
+  description = "Map of monitored branches for pipeline"
+  type = map
+}
+
+variable "repositories" {
+  description = "Map of repos for pipeline"
+  type = map
+}

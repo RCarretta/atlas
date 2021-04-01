@@ -56,6 +56,19 @@ resource "aws_sns_topic" "alerts" {
   }
 }
 
+resource "aws_s3_bucket" "pipeline" {
+  bucket = "${var.environment}-${var.application_name}-pipeline"
+  acl    = "private"
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
 module "api_lambda_document" {
   source = "../modules/lambda_api_handler"
   application_name = var.application_name
@@ -64,4 +77,14 @@ module "api_lambda_document" {
   lambda_desc = "API for /document and subtree"
   lambda_name = "document"
   lambda_runtime = "python3.6"
+}
+
+module "frontend_pipeline" {
+  source = "../modules/cicd_pipeline_frontend"
+  application_name = var.application_name
+  artifact_bucket = aws_s3_bucket.pipeline.bucket
+  environment = var.environment
+  monitored_branch = var.pipeline_branch['frontend']
+  repository = var.repositories['frontend']
+  web_bucket = var.dns_zone
 }
