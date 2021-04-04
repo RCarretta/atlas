@@ -1,6 +1,7 @@
 # General environment
 region      = "us-east-1"
 environment = "prod"
+aws_account = "650462489189"
 
 # DNS
 dns_zone    = "eldritch-atlas.com"
@@ -13,5 +14,5 @@ pipeline_branch = {
 }
 
 repositories = {
-  frontend = "atlas/web-app"
+  frontend = "eldritch-atlas/web-app"
 }

@@ -69,3 +69,13 @@ variable "frontend_buildspec_filename" {
   description = "Filename of buildspec yaml"
   type = string
 }
+
+variable "codestar_connection_arn" {
+  description = "Name of the AWS CodeStar connection"
+  type = string
+}
+
+variable "log_group" {
+  description = "Name of the build CloudWatch log group"
+  type = string
+}

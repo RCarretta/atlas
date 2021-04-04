@@ -59,14 +59,6 @@ resource "aws_sns_topic" "alerts" {
 resource "aws_s3_bucket" "pipeline" {
   bucket = "${var.environment}-${var.application_name}-pipeline"
   acl    = "private"
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
 }
 
 module "api_lambda_document" {
@@ -88,4 +80,14 @@ module "frontend_pipeline" {
   repository = var.repositories["frontend"]
   web_bucket = var.dns_zone
   frontend_buildspec_filename = "frontend-buildspec.yml"
+  codestar_connection_arn = "arn:aws:codestar-connections:us-east-1:650462489189:connection/e4f10feb-2172-4621-9b19-3350a3ca8191"
+  log_group = aws_cloudwatch_log_group.build.name
+}
+
+resource "aws_cloudwatch_log_group" "build" {
+  name = "${var.environment}/${var.application_name}"
+
+  tags = {
+    Environment = var.environment
+  }
 }

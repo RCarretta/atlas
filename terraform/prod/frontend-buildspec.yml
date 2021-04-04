@@ -22,9 +22,9 @@ phases:
 
 artifacts:
   files:
-    - "public/**/*"
+    - "**/*"
   name: "${environment}-${application_name}-frontend"
-  base-directory: build
+  base-directory: public
 
 cache:
   paths:
